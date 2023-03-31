@@ -1,0 +1,14 @@
+################################################################################
+# Git attributes configuration. Uses glob-like patterns to enforce certain     #
+# file-specific behaviors like CRLF or LF in text files or if a file should    #
+# be identified as binary in Git.                                              #
+################################################################################
+
+# Default.
+* text=auto eol=crlf
+
+# Unix files.
+*.sh text eol=lf
+
+# Text files.
+*.md text eol=crlf diff=markdown

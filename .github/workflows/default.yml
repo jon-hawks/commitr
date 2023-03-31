@@ -1,0 +1,17 @@
+################################################################################
+# This pipeline validates that the code builds, is linted properly, passes     #
+# unit tests, and passes a security audit.                                     #
+################################################################################
+name: default
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@main
+      with:
+        fetch-depth: 0
