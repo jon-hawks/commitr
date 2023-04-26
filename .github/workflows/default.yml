@@ -35,8 +35,7 @@ jobs:
     # Install and run a linter.
     - name: Lint
       run: |-
-        sudo apt install shellcheck
-        shellcheck
+        shellcheck commit.sh
 
   # Build and deploy this code (e.g. to a Kubernetes cluster).
   deploy:
@@ -61,7 +60,7 @@ jobs:
       with:
         token_format: access_token
         workload_identity_provider: projects/921831209165/locations/global/workloadIdentityPools/default/providers/default
-        service_account: default@default.iam.gserviceaccount.com
+        service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
 
     # Configure Docker to use our OAuth 2.0 access token.
     - name: Docker configuration
