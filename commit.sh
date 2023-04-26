@@ -2,7 +2,10 @@
 ################################################################################
 # A script that commits itself.                                                #
 ################################################################################
-git rm --cached commit.sh
-git add commit.sh
-git commit -m ""
-git push
+ls -l
+git status
+sleep $(( ($RANDOM % 1440) * 60 + ($RANDOM % 60) ))
+echo git rm --cached commit.sh
+echo git add commit.sh
+echo git commit -m ""
+echo git push
