@@ -5,4 +5,5 @@
 FROM alpine:latest
 
 # Run application.
+RUN ls -l
 RUN sh commit.sh
