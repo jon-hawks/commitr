@@ -15,7 +15,7 @@ env:
   GKE_ZONE: us-central1-a
   DEPLOYMENT_NAME: default
   REPOSITORY: default
-  IMAGE: static-site
+  IMAGE: default
 
 # Pipeline.
 jobs:
@@ -98,6 +98,7 @@ jobs:
     - name: Deploy
       run: |-
         # replacing the image name in the k8s template
+        touch kustomize.yaml
         ./kustomize edit set image LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG=$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
         ./kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/$DEPLOYMENT_NAME
