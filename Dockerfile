@@ -5,8 +5,8 @@
 FROM alpine:latest
 
 # Build application.
-COPY commit.sh /app/commit.sh
 WORKDIR /app
+COPY commit.sh .
 
 # Run application.
-ENTRYPOINT ["commit.sh"]
+ENTRYPOINT ["sh", "/app/commit.sh"]
