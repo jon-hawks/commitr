@@ -15,7 +15,7 @@ apk add --no-cache git
 
 # Clone this repository.
 git clone --depth 1 --no-tags --single-branch https://github.com/jon-hawks/commitr.git
-cd commitr
+cd commitr || exit 1
 
 # Commit a file.
 git status
