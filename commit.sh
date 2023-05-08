@@ -10,7 +10,7 @@
 apk add --no-cache git
 
 # Clone this repository.
-git clone --depth 1 --no-tags --single-branch https://github.com/jon-hawks/commitr.git
+git clone --depth 1 --no-tags --single-branch $GITHUB_TOKEN@$GITHUB_REPO
 cd commitr || exit 1
 
 # Commit a file.
@@ -21,4 +21,5 @@ git add commit.sh
 git status
 git commit -m "Update commit script."
 git status
-git push
+printenv
+echo git push
