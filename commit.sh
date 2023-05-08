@@ -3,10 +3,6 @@
 # A script that commits itself.                                                #
 ################################################################################
 
-# Feedback; development.
-pwd
-ls -l
-
 # Wait somewhere between 1 second and 1 day.
 # sleep $(( ($(awk 'BEGIN { srand(); print int(rand()*32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand()*32768) }' /dev/null) % 60) ))
 
@@ -19,7 +15,10 @@ cd commitr || exit 1
 
 # Commit a file.
 git status
-echo git rm --cached commit.sh
-echo git add commit.sh
-echo git commit -m ""
-echo git push
+git rm --cached commit.sh
+git status
+git add commit.sh
+git status
+git commit -m "Update commit script."
+git status
+git push
