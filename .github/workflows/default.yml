@@ -43,7 +43,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    requires: verify
     runs-on: ubuntu-latest
     steps:
 
