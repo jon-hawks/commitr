@@ -43,6 +43,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+    requires: verify
     runs-on: ubuntu-latest
     steps:
 
@@ -63,7 +64,7 @@ jobs:
         service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
 
     # Configure Docker to use our OAuth 2.0 access token.
-    - name: Docker configuration
+    - name: Configure Docker
       run: |-
         echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
 
@@ -92,10 +93,8 @@ jobs:
     - name: Deploy
       run: |-
         # replacing the image name in the k8s template
-         kubectl create deployment default \
+         kubectl create deployment $DEPLOYMENT_NAME \
            --image="$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
            -o yaml \
            --dry-run=client \
         | kubectl apply -f -
-        kubectl rollout status deployment/$DEPLOYMENT_NAME
-        kubectl get services -o wide

@@ -4,9 +4,9 @@
 # Set OS.
 FROM alpine:latest
 
-# Run application.
-RUN ls -l
+# Build application.
 COPY . /app
 WORKDIR /app
-RUN ls -l
-RUN sh commit.sh
+
+# Run application.
+ENTRYPOINT ["bash", "commit.sh"]
