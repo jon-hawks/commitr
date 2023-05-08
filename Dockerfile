@@ -9,4 +9,4 @@ WORKDIR /app
 COPY commit.sh .
 
 # Run application.
-ENTRYPOINT ["sh", "/app/commit.sh"]
+ENTRYPOINT /app/commit.sh
