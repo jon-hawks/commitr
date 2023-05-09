@@ -88,6 +88,8 @@ jobs:
     - name: Deploy
       run: |-
         pwd
-        ls -l
-        ls -l ../..
+        ls -al
+        ls -al ..
+        ls -al ../..
+        tree ../..
         envsubst < .deployment.yaml | kubectl apply -f -
