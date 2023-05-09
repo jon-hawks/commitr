@@ -1,5 +1,7 @@
 ﻿apiVersion: apps/v1
 kind: Deployment
+metadata:
+  name: default
 spec:
   template:
     spec:
