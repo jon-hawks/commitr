@@ -10,7 +10,8 @@
 apk add --no-cache git
 
 # Clone this repository.
-git clone --depth 1 --no-tags --single-branch $GITHUB_TOKEN@$GITHUB_REPO
+printenv
+git clone --depth 1 --no-tags --single-branch "$GITHUB_TOKEN@$GITHUB_REPO"
 cd commitr || exit 1
 
 # Commit a file.
@@ -21,5 +22,4 @@ git add commit.sh
 git status
 git commit -m "Update commit script."
 git status
-printenv
 echo git push

@@ -4,4 +4,9 @@ spec:
   template:
     spec:
       containers:
-      - image: DEFAULT
+      - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+        env:
+          - name: GITHUB_REPO
+            value: "$GITHUB_REPO"
+          - name: GITHUB_TOKEN
+            value: "$GITHUB_TOKEN"
