@@ -11,7 +11,7 @@ sleep 30
 apk add --no-cache git
 
 # Clone this repository.
-git clone --depth 1 --no-tags --single-branch "https://$GITHUB_TOKEN:@github.com/$GITHUB_REPO.git"
+git clone --depth 1 --no-tags --single-branch "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPO.git"
 cd commitr || exit 1
 
 # Commit a file.
