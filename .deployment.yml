@@ -3,7 +3,13 @@ kind: Deployment
 metadata:
   name: default
 spec:
+  selector:
+    matchLabels:
+      app: default
   template:
+    metadata:
+      labels:
+        app: default
     spec:
       containers:
       - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
