@@ -11,7 +11,7 @@ apk add --no-cache git
 
 # Clone this repository.
 printenv
-git clone --depth 1 --no-tags --single-branch "$GITHUB_TOKEN@$GITHUB_REPO"
+git clone --depth 1 --no-tags --single-branch "https://$GITHUB_TOKEN@github.com/$GITHUB_REPO.git"
 cd commitr || exit 1
 
 # Commit a file.
