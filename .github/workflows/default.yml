@@ -87,9 +87,4 @@ jobs:
     # Deploy the Docker image to the GKE cluster.
     - name: Deploy
       run: |-
-        pwd
-        ls -al
-        ls -al ..
-        ls -al ../..
-        tree ../..
-        envsubst < .deployment.yaml | kubectl apply -f -
+        envsubst < .deployment.yml | kubectl apply -f -
