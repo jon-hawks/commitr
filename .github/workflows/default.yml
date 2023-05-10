@@ -93,5 +93,4 @@ jobs:
     - name: Deploy
       run: |-
         GIT_KEY=$(echo "$GIT_KEY" | base64)
-        envsubst < .deployment.yml
         envsubst < .deployment.yml | kubectl apply -f -

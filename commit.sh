@@ -3,9 +3,6 @@
 # A script that commits itself.                                                #
 ################################################################################
 
-# Debugging; feedback.
-echo "$(echo "$GIT_KEY" | base64 -d)"
-
 # Wait somewhere between 1 second and 1 day.
 # sleep $(( ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 60) ))
 sleep 30
@@ -17,10 +14,10 @@ apk add --no-cache git openssh
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_USER"
 git config --global core.sshCommand "echo \"$(echo "$GIT_KEY" | base64 -d)\" | ssh -i /dev/stdin -o IdentitiesOnly=yes"
+mkdir -p ~/.ssh
 ssh-keyscan github.com > ~/.ssh/known_hosts
 
 # Clone this repository.
-mkdir -p ~/.ssh
 git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GITHUB_REPO.git"
 cd commitr || exit 1
 
