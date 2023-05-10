@@ -8,7 +8,7 @@
 sleep 30
 
 # Install Git.
-apk add --no-cache git ssh
+apk add --no-cache git openssh
 
 # Clone this repository.
 git clone --depth 1 --no-tags --single-branch "https://github.com/$GITHUB_REPO.git"
