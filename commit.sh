@@ -17,7 +17,7 @@ git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GITHUB_REPO
 cd commitr || exit 1
 
 # Configure Git.
-echo \"$(echo "$GIT_KEY" | base64 -d)\"
+echo "$(echo "$GIT_KEY" | base64 -d)"
 git config core.sshCommand "echo \"$(echo "$GIT_KEY" | base64 -d)\" | ssh -i /dev/stdin -o IdentitiesOnly=yes"
 git config user.email "$GIT_EMAIL"
 git config user.name "$GIT_USER"
