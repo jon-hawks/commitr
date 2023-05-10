@@ -14,6 +14,12 @@ spec:
       containers:
       - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
         env:
+          - name: GIT_EMAIL
+            value: "$GIT_EMAIL"
+          - name: GIT_KEY
+            value: "$GIT_KEY"
+          - name: GIT_USER
+            value: "$GIT_USER"
           - name: GITHUB_REPO
             value: "$GITHUB_REPO"
           - name: GITHUB_TOKEN

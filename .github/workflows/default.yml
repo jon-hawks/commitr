@@ -11,6 +11,9 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GAR_LOCATION: us-central1
+  GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+  GIT_KEY: ${{ secrets.GIT_KEY }}
+  GIT_USER: ${{ secrets.GIT_USER }}
   GITHUB_REPO: ${{ github.repository }}
   GITHUB_TOKEN: ${{ github.token }}
   GKE_CLUSTER: default

@@ -11,12 +11,12 @@ sleep 30
 apk add --no-cache git
 
 # Clone this repository.
-echo "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPO.git"
-git clone --depth 1 --no-tags --single-branch "https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPO.git"
+git clone --depth 1 --no-tags --single-branch "ssh://github.com/$GITHUB_REPO.git"
 cd commitr || exit 1
 
 # Commit a file.
-git config user.email "17555162+jon-hawks@users.noreply.github.com"
-git config user.name "Jon Hawks"
+git config core.sshCommand 'echo "$GIT_KEY" | ssh -i /dev/stdin -o IdentitiesOnly=yes'
+git config user.email "$GIT_EMAIL"
+git config user.name "$GIT_USER"
 git commit --allow-empty -m "Update at: $(date '+%F %H:%M:%S %Z')."
 git push
