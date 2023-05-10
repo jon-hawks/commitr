@@ -11,7 +11,8 @@ sleep 30
 apk add --no-cache git openssh
 
 # Clone this repository.
-ssh-keyscan github.com >> ~/.ssh/known_hosts
+mkdir -p ~/.ssh
+ssh-keyscan github.com > ~/.ssh/known_hosts
 git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GITHUB_REPO.git"
 cd commitr || exit 1
 
