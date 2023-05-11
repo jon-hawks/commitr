@@ -13,6 +13,7 @@ apk add --no-cache git openssh
 # Configure Git.
 mkdir -p ~/.ssh
 echo "$GIT_KEY" | base64 -d > ~/.ssh/id_rsa
+chmod 400 ~/.ssh/id_rsa
 ssh-keyscan github.com > ~/.ssh/known_hosts
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_USER"
