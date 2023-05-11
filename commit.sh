@@ -13,13 +13,15 @@ apk add --no-cache git openssh
 # Configure Git.
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_USER"
-git config --global core.sshCommand "echo \"$(echo "$GIT_KEY" | base64 -d)\" | ssh -i /dev/stdin -o IdentitiesOnly=yes"
+git config --global core.sshCommand "printf \"$(echo "$GIT_KEY" | base64 -d)\n\" | ssh -i /dev/stdin -o IdentitiesOnly=yes"
 mkdir -p ~/.ssh
 ssh-keyscan github.com > ~/.ssh/known_hosts
 
 # Debugging; feedback.
 echo "----------"
-echo "$GIT_KEY" | base64 -d
+printf "$(echo "$GIT_KEY" | base64 -d)\n" | cat /dev/stdin
+echo "----------"
+printf "$(echo "$GIT_KEY" | base64 -d)\n" | ssh-keygen -y -e -f /dev/stdin
 echo "----------"
 
 # Clone this repository.
