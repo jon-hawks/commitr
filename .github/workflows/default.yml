@@ -15,7 +15,6 @@ env:
   GIT_KEY: ${{ secrets.GIT_KEY }}
   GIT_USER: ${{ secrets.GIT_USER }}
   GITHUB_REPO: ${{ github.repository }}
-  GITHUB_TOKEN: ${{ github.token }}
   GKE_CLUSTER: default
   GKE_ZONE: us-central1-a
   DEPLOYMENT_NAME: default
@@ -92,5 +91,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster.
     - name: Deploy
       run: |-
-        GIT_KEY=$(echo "$GIT_KEY" | base64)
+        GIT_KEY=$(echo "$GIT_KEY" | base64 -w 0)
         envsubst < .deployment.yml | kubectl apply -f -

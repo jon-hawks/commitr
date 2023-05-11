@@ -17,6 +17,11 @@ git config --global core.sshCommand "echo \"$(echo "$GIT_KEY" | base64 -d)\" | s
 mkdir -p ~/.ssh
 ssh-keyscan github.com > ~/.ssh/known_hosts
 
+# Debugging; feedback.
+echo "----------"
+echo "$GIT_KEY" | base64 -d
+echo "----------"
+
 # Clone this repository.
 git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GITHUB_REPO.git"
 cd commitr || exit 1

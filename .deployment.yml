@@ -22,6 +22,4 @@ spec:
             value: "$GIT_USER"
           - name: GITHUB_REPO
             value: "$GITHUB_REPO"
-          - name: GITHUB_TOKEN
-            value: "$GITHUB_TOKEN"
         name: default
