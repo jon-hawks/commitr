@@ -4,7 +4,7 @@
 ################################################################################
 
 # Wait somewhere between 1 second and 1 day.
-TIMER=$(( ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 60) ))
+TIMER=$(shuf -i 1-86400 -n 1)
 while [ "$TIMER" -gt 0 ]; do
     echo "Committing in $TIMER seconds."
     sleep 1
