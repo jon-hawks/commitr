@@ -4,7 +4,11 @@
 ################################################################################
 
 # Wait somewhere between 1 second and 1 day.
-sleep $(( ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 60) ))
+TIMER=$(( ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 60) ))
+for ((;TIMER>0; TIMER--)); do
+    echo "Restarting in $TIMER seconds."
+    sleep 1
+done
 
 # Install Git.
 apk add --no-cache git openssh
