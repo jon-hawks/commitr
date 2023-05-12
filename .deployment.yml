@@ -1,16 +1,9 @@
-﻿apiVersion: apps/v1
-kind: Deployment
+﻿apiVersion: batch/v1
+kind: Job
 metadata:
   name: default
 spec:
-  backoffLimit: 0
-  selector:
-    matchLabels:
-      app: default
   template:
-    metadata:
-      labels:
-        app: default
     spec:
       containers:
       - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
