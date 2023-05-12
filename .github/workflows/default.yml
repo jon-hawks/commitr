@@ -91,5 +91,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster.
     - name: Deploy
       run: |-
-        GIT_KEY=$(echo "$GIT_KEY" | base64 -w 0)
+        GIT_KEY=$(echo "$GIT_KEY" | base64)
         envsubst < .deployment.yml | kubectl apply -f -
