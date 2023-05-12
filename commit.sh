@@ -5,9 +5,10 @@
 
 # Wait somewhere between 1 second and 1 day.
 TIMER=$(( ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 1440) * 60 + ($(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null) % 60) ))
-for ((; TIMER > 0; TIMER = TIMER - 1)); do
+while [ "$TIMER" -gt 0 ]; do
     echo "Committing in $TIMER seconds."
     sleep 1
+    TIMER=$((TIMER - 1))
 done
 
 # Install Git.
