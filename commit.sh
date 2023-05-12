@@ -30,3 +30,6 @@ cd commitr || exit 1
 # Commit a file.
 git commit --allow-empty -m "Update at: $(date '+%F %H:%M:%S %Z')."
 git push
+
+# Done; wait forever to prevent Kubernetes deployment from restarting the pod.
+sleep infinity
