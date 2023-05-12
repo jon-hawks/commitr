@@ -7,11 +7,11 @@ spec:
     matchLabels:
       app: default
   template:
-    backoffLimit: 0
     metadata:
       labels:
         app: default
     spec:
+      backoffLimit: 0
       containers:
       - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
         env:
