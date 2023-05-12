@@ -1,9 +1,15 @@
-﻿apiVersion: batch/v1
-kind: Job
+﻿apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: default
 spec:
+  selector:
+    matchLabels:
+      app: default
   template:
+    metadata:
+      labels:
+        app: default
     spec:
       containers:
       - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
@@ -17,4 +23,3 @@ spec:
           - name: GITHUB_REPO
             value: "$GITHUB_REPO"
         name: default
-      restartPolicy: Never
