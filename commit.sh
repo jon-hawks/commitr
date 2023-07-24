@@ -3,12 +3,24 @@
 # A script that commits itself.                                                #
 ################################################################################
 
-# Wait somewhere between 1 second and 1 day.
-TIMER=$(shuf -i 1-86400 -n 1)
-while [ "$TIMER" -gt 0 ]; do
-    echo "Committing in $TIMER seconds."
-    sleep 1
-    TIMER=$((TIMER - 1))
+# Add randomization.
+while true; do
+
+    # Wait somewhere between 1 second and 1 day.
+    TIMER=$(shuf -i 1-86400 -n 1)
+    while [ "$TIMER" -gt 0 ]; do
+        echo "Committing in $TIMER seconds."
+        sleep 1
+        TIMER=$((TIMER - 1))
+    done
+
+    # Only execute sometimes.
+    if [ "$(date +%u)" -lt 6 ]; then
+        [ "$RANDOM" -lt 24575 ] && break # 75% chance on weekdays.
+    else
+        [ "$RANDOM" -lt 16384 ] && break # 50% chance on weekends.
+    fi
+
 done
 
 # Install Git.
