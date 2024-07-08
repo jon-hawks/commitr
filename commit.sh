@@ -17,9 +17,9 @@ while true; do
     # Only execute sometimes.
     RAND=$(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null)
     if [ "$(date +%u)" -lt 6 ]; then
-        [ "$RAND" -lt 24575 ] && break # 75% chance on weekdays.
+        [ "$RAND" -lt 16384 ] && break # 50% chance on weekdays.
     else
-        [ "$RAND" -lt 16384 ] && break # 50% chance on weekends.
+        [ "$RAND" -lt  8192 ] && break # 25% chance on weekends.
     fi
 
 done
