@@ -9,17 +9,16 @@ on:
 
 # Environment variables.
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GAR_LOCATION: us-central1
+  GAR_IMAGE: ${{ secrets.GAR_IMAGE }}
+  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  GAR_REPO: ${{ secrets.GAR_REPOSITORY }}
+  GCP_ID: ${{ secrets.GCP_ID }}
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   GIT_KEY: ${{ secrets.GIT_KEY }}
+  GIT_REPO: ${{ github.repository }}
   GIT_USER: ${{ secrets.GIT_USER }}
-  GITHUB_REPO: ${{ github.repository }}
-  GKE_CLUSTER: default
-  GKE_ZONE: us-central1-a
-  DEPLOYMENT_NAME: default
-  REPOSITORY: default
-  IMAGE: default
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
 # Pipeline.
 jobs:
@@ -64,7 +63,7 @@ jobs:
       with:
         token_format: access_token
         workload_identity_provider: projects/921831209165/locations/global/workloadIdentityPools/default/providers/default
-        service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+        service_account: default@${{ env.GKE_PROJECT }}.iam.gserviceaccount.com
 
     # Configure Docker to use our OAuth 2.0 access token.
     - name: Configure Docker

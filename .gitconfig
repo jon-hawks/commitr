@@ -1,0 +1,5 @@
+[user]
+    name = Jon Hawks
+    email = 17555162+jon-hawks@users.noreply.github.com
+[credential]
+    helper = cache
