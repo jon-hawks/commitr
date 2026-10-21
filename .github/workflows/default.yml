@@ -11,7 +11,7 @@ on:
 env:
   IMAGE: ${{ secrets.GAR_IMAGE }}
   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
-  REPOSITORY: ${{ secrets.GAR_REPOSITORY }}
+  REPOSITORY: ${{ secrets.GAR_REPO }}
   PROJECT_ID: ${{ secrets.GCP_ID }}
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   GIT_KEY: ${{ secrets.GIT_KEY }}
@@ -90,5 +90,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster.
     - name: Deploy
       run: |-
-        GIT_KEY=$(echo "$GIT_KEY" | base64 -w 0)
+        GIT_KEY=$(echo "$GIT_KEY" | base64)
         envsubst < .deployment.yml | kubectl apply -f -
