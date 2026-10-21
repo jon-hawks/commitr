@@ -16,14 +16,14 @@ spec:
         app: default
     spec:
       containers:
-      - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+      - image: "us-central1-docker.pkg.dev/default-4/default/default:$GITHUB_SHA"
         env:
           - name: GIT_EMAIL
-            value: "$GIT_EMAIL"
+            value: "17555162+jon-hawks@users.noreply.github.com"
           - name: GIT_KEY
             value: "$GIT_KEY"
           - name: GIT_USER
-            value: "$GIT_USER"
-          - name: GITHUB_REPO
-            value: "$GITHUB_REPO"
+            value: "Jon Hawks"
+          - name: GIT_REPO
+            value: "$GITHUB_REPOSITORY"
         name: default

@@ -4,21 +4,7 @@
 ################################################################################
 name: default
 
-on:
-  push:
-
-# Environment variables.
-env:
-  IMAGE: ${{ secrets.GAR_IMAGE }}
-  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
-  REPOSITORY: ${{ secrets.GAR_REPO }}
-  PROJECT_ID: ${{ secrets.GCP_ID }}
-  GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
-  GIT_KEY: ${{ secrets.GIT_KEY }}
-  GITHUB_REPO: ${{ github.repository }}
-  GIT_USER: ${{ secrets.GIT_USER }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  GKE_ZONE: ${{ secrets.GKE_ZONE }}
+on: push
 
 # Pipeline.
 jobs:
@@ -31,9 +17,6 @@ jobs:
     # Checkout this repository. Note: this should likely always come first.
     - name: Checkout Repository
       uses: actions/checkout@main
-      with:
-        # Pull faster.
-        fetch-depth: 0
 
     # Install and run a linter.
     - name: Lint
@@ -52,9 +35,6 @@ jobs:
     # Checkout this repository. Note: this should likely always come first.
     - name: Checkout Repository
       uses: actions/checkout@main
-      with:
-        # Pull faster.
-        fetch-depth: 0
 
     # Configure a Workload Identity federation for Google Cloud and generate an access token.
     - id: auth
@@ -63,32 +43,31 @@ jobs:
       with:
         token_format: access_token
         workload_identity_provider: projects/921831209165/locations/global/workloadIdentityPools/default/providers/default
-        service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+        service_account: default@default-4.iam.gserviceaccount.com
 
     # Configure Docker to use our OAuth 2.0 access token.
     - name: Configure Docker
       run: |-
-        echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
+        echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
 
     # Get the GKE credentials so we can deploy to the cluster.
     - name: Setup GKE credentials
       uses: google-github-actions/get-gke-credentials@main
       with:
-        cluster_name: ${{ env.GKE_CLUSTER }}
-        location: ${{ env.GKE_ZONE }}
+        cluster_name: projects/default-4/locations/us-central1-a/clusters/default
 
     # Build the Docker image.
     - name: Build
       run: |-
-        docker build --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" .
+        docker build --tag "us-central1-docker.pkg.dev/default-4/default/default:$GITHUB_SHA" .
 
     # Push the Docker image to Google Artifact Registry.
     - name: Publish
       run: |-
-        docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+        docker push "us-central1-docker.pkg.dev/default-4/default/default:$GITHUB_SHA"
 
     # Deploy the Docker image to the GKE cluster.
     - name: Deploy
       run: |-
-        GIT_KEY=$(echo "$GIT_KEY" | base64)
+        export GIT_KEY=$(echo "${{ secrets.GIT_KEY }}" | base64)
         envsubst < .deployment.yml | kubectl apply -f -

@@ -37,7 +37,7 @@ git config --global user.name "$GIT_USER"
 git config --global core.sshCommand "ssh -i ~/.ssh/id_rsa -o IdentitiesOnly=yes"
 
 # Clone this repository.
-git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GITHUB_REPO.git"
+git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GIT_REPO.git"
 cd commitr || exit 1
 
 # Commit a file.
