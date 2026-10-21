@@ -7,12 +7,7 @@
 while true; do
 
     # Wait somewhere between 1 second and 1 day.
-    TIMER=$(shuf -i 1-86400 -n 1)
-    while [ "$TIMER" -gt 0 ]; do
-        echo "Committing in $TIMER seconds."
-        sleep 1
-        TIMER=$((TIMER - 1))
-    done
+    sleep "$(shuf -i 1-86400 -n 1)"
 
     # Only execute sometimes.
     RAND=$(awk 'BEGIN { srand(); print int(rand() * 32768) }' /dev/null)
@@ -34,10 +29,9 @@ chmod 400 ~/.ssh/id_rsa
 ssh-keyscan github.com > ~/.ssh/known_hosts
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_USER"
-git config --global core.sshCommand "ssh -i ~/.ssh/id_rsa -o IdentitiesOnly=yes"
 
 # Clone this repository.
-git clone --depth 1 --no-tags --single-branch "ssh://git@github.com/$GIT_REPO.git"
+git clone --depth 1 "git@github.com:$GIT_REPO.git"
 cd commitr || exit 1
 
 # Commit a file.

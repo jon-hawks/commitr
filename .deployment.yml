@@ -14,9 +14,6 @@ metadata:
 # Configure deployment behavior and pod template.
 spec:
 
-  # Retain two previous revisions for rollback.
-  revisionHistoryLimit: 2
-
   # Select pods managed by this deployment.
   selector:
     matchLabels:
@@ -38,7 +35,7 @@ spec:
         # Configure Git identity, credentials, and target repository.
         env:
           - name: GIT_EMAIL
-            value: "17555162+jon-hawks@users.noreply.github.com"
+            value: "$GITHUB_REPOSITORY_OWNER_ID+$GITHUB_REPOSITORY_OWNER@users.noreply.github.com"
           - name: GIT_KEY
             value: "$GIT_KEY"
           - name: GIT_USER

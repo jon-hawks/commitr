@@ -4,11 +4,11 @@
 # be identified as binary in Git.                                              #
 ################################################################################
 
-# Default.
+# Default; all files.
 * text=auto eol=crlf
 
 # Unix files.
 *.sh text eol=lf
 
 # Text files.
-*.md text eol=crlf diff=markdown
+*.md diff=markdown

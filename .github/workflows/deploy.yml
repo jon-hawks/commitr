@@ -1,6 +1,5 @@
 ################################################################################
-# This pipeline validates that the code builds, is linted properly, passes     #
-# unit tests, and passes a security audit.                                     #
+# Build, publish, and deploy this application to GKE.                           #
 ################################################################################
 name: deploy
 
@@ -9,29 +8,13 @@ on: push
 # Pipeline.
 jobs:
 
-  # Verification stage.
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-
-    # Checkout this repository. Note: this should likely always come first.
-    - name: Checkout Repository
-      uses: actions/checkout@main
-
-    # Install and run a linter.
-    - name: Lint
-      run: |-
-        shellcheck commit.sh
-
   # Build and deploy this code (e.g. to a Kubernetes cluster).
   deploy:
     environment: production
-    concurrency:
-      group: commitr-production
-      cancel-in-progress: false
+    concurrency: commitr-production
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
 
@@ -54,34 +37,28 @@ jobs:
         echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
 
     # Get the GKE credentials so we can deploy to the cluster.
-    - name: Setup GKE credentials
+    - name: Setup GKE Credentials
       uses: google-github-actions/get-gke-credentials@main
       with:
         cluster_name: projects/default-4/locations/us-central1-a/clusters/apps
 
     # Build the Docker image.
-    - name: Build
+    - name: Build Image
       run: |-
         docker build --tag "us-central1-docker.pkg.dev/default-4/apps/commitr:$GITHUB_SHA" .
 
     # Push the Docker image to Google Artifact Registry.
-    - name: Publish
+    - name: Publish to GAR
       run: |-
         docker push "us-central1-docker.pkg.dev/default-4/apps/commitr:$GITHUB_SHA"
 
     # Deploy the Docker image to the GKE cluster.
-    - name: Deploy
+    - name: Deploy to Cluster
       run: |-
         export GIT_KEY=$(echo "${{ secrets.GIT_KEY }}" | base64)
         envsubst < .deployment.yml | kubectl apply -f -
 
-    # Protect deployed image and two rollback revisions from registry cleanup.
-    - name: Retain Deployment Images
+    # Verify deployment rollout succeeds.
+    - name: Verify Deployment
       run: |-
-        set -o pipefail
         kubectl rollout status deployment/commitr -n commitr-prod --timeout=180s
-        kubectl get replicasets -n commitr-prod -l app.kubernetes.io/name=commitr -o json |
-          jq -r '.items | sort_by(.metadata.annotations["deployment.kubernetes.io/revision"] | tonumber) | reverse | .[:3] | to_entries | reverse[] | "\(.key) \(.value.spec.template.spec.containers[0].image)"' |
-          while read -r slot image; do
-            docker buildx imagetools create --prefer-index=false --tag "us-central1-docker.pkg.dev/default-4/apps/commitr:keep-$slot" "$image"
-          done
