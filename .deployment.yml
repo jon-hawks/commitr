@@ -1,17 +1,12 @@
-################################################################################
-# One committer; replace its timer on each successful deployment.                #
+﻿################################################################################
+# Kubernetes deployment manifest.                                              #
 ################################################################################
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: default
-  namespace: default
 spec:
-  replicas: 1
   revisionHistoryLimit: 2
-  # Prevent overlapping timers during rollout on the single-node pool.
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: default
@@ -21,32 +16,14 @@ spec:
         app: default
     spec:
       containers:
-        - name: default
-          image: "${IMAGE_URI}"
-          env:
-            - name: GIT_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: commitr-git
-                  key: email
-            - name: GIT_USER
-              valueFrom:
-                secretKeyRef:
-                  name: commitr-git
-                  key: user
-            - name: GITHUB_REPO
-              value: "${GITHUB_REPOSITORY}"
-            - name: GIT_BRANCH
-              value: main
-          volumeMounts:
-            - name: git-key
-              mountPath: /var/run/commitr-ssh
-              readOnly: true
-      volumes:
-        - name: git-key
-          secret:
-            secretName: commitr-git
-            defaultMode: 0400
-            items:
-              - key: key
-                path: id
+      - image: "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+        env:
+          - name: GIT_EMAIL
+            value: "$GIT_EMAIL"
+          - name: GIT_KEY
+            value: "$GIT_KEY"
+          - name: GIT_USER
+            value: "$GIT_USER"
+          - name: GITHUB_REPO
+            value: "$GITHUB_REPO"
+        name: default

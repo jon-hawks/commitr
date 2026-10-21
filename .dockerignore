@@ -1,5 +1,0 @@
-# Only runtime sources belong in the build context.
-*
-!Dockerfile
-!commit.sh
-!github_known_hosts

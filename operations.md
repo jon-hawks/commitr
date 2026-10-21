@@ -81,30 +81,9 @@ Requirements for that follow-up:
   Kubernetes manifest so revision retention remains consistent.
 - Keep GKE-owned resources and IAM service agents outside artifact cleanup.
 
-The deployment-cycle repair below fixes the workflow's inconsistent variable
-names. Automatic artifact cleanup remains a separate open task. Do not trigger
-the Git-writing application merely to test cleanup.
+The workflow variable names have been aligned. Automatic artifact cleanup
+remains a separate open task. Do not trigger the Git-writing application merely
+to test cleanup.
 
 References: [Artifact Registry cleanup policies](https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy)
 and [Kubernetes deployment history](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy).
-
-
-## Deployment-cycle repair — 2026-10-21
-
-The recorded deployment failure was an invalid service-account email:
-`default@.iam.gserviceaccount.com`, caused by the undefined `GKE_PROJECT`
-variable. Image and repository variables also disagreed across the workflow,
-manifest, and script. The old script pushed successfully on October 18, then
-slept forever without checking whether its replacement arrived.
-
-The repair uses consistent configuration, release-pinned actions, validation
-before deployment, a Kubernetes Secret for Git credentials, and a rollout
-completion check. Git/SSH are installed when building the image. The committer
-retries failed pushes and resumes its schedule if a replacement never arrives.
-`Recreate` prevents the old and new timers from overlapping during rollout.
-The default minimum delay is now five minutes; the original weekday/weekend
-probabilities are retained. See the README for configuration and recovery.
-
-Local validation covers real Git commits against a temporary bare repository,
-clone/push failures, missing redeployments, multiline credential transport, and
-failed secret creation/rollout. No automatic image-deletion policy was added.

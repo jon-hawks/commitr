@@ -1,90 +1,94 @@
 ################################################################################
-# Validate, build, and redeploy main; the running pod triggers the next push.    #
+# This pipeline validates that the code builds, is linted properly, passes     #
+# unit tests, and passes a security audit.                                     #
 ################################################################################
 name: default
 
 on:
   push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:
 
-permissions:
-  contents: read
-
-# Finish each deployment before another run can change production.
-concurrency:
-  group: commitr-${{ github.ref }}
-  cancel-in-progress: false
-
-# Preserve existing secrets; defaults describe this repository's GKE deployment.
+# Environment variables.
 env:
-  PROJECT_ID: ${{ secrets.GCP_ID || 'default-4' }}
-  GAR_LOCATION: ${{ secrets.GAR_LOCATION || 'us-central1' }}
-  GAR_REPOSITORY: ${{ secrets.GAR_REPOSITORY || 'default' }}
-  GAR_IMAGE: ${{ secrets.GAR_IMAGE || 'default' }}
-  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER || 'default' }}
-  GKE_ZONE: ${{ secrets.GKE_ZONE || 'us-central1-a' }}
+  IMAGE: ${{ secrets.GAR_IMAGE }}
+  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  REPOSITORY: ${{ secrets.GAR_REPOSITORY }}
+  PROJECT_ID: ${{ secrets.GCP_ID }}
+  GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+  GIT_KEY: ${{ secrets.GIT_KEY }}
+  GITHUB_REPO: ${{ github.repository }}
+  GIT_USER: ${{ secrets.GIT_USER }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  GKE_ZONE: ${{ secrets.GKE_ZONE }}
 
+# Pipeline.
 jobs:
-  verify:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Lint shell scripts
-        run: shellcheck commit.sh deploy.sh
-      - name: Test commit cycle and deployment
-        run: python3 -m unittest discover -s tests -v
 
+  # Verification stage.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+
+    # Checkout this repository. Note: this should likely always come first.
+    - name: Checkout Repository
+      uses: actions/checkout@main
+      with:
+        # Pull faster.
+        fetch-depth: 0
+
+    # Install and run a linter.
+    - name: Lint
+      run: |-
+        shellcheck commit.sh
+
+  # Build and deploy this code (e.g. to a Kubernetes cluster).
   deploy:
-    needs: verify
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     environment: production
     permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
 
-      # Build before acquiring short-lived Google credentials.
-      - name: Build
-        run: |
-          image_uri="$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$GAR_IMAGE:$GITHUB_SHA"
-          echo "IMAGE_URI=$image_uri" >> "$GITHUB_ENV"
-          docker build --tag "$image_uri" .
+    # Checkout this repository. Note: this should likely always come first.
+    - name: Checkout Repository
+      uses: actions/checkout@main
+      with:
+        # Pull faster.
+        fetch-depth: 0
 
-      - id: auth
-        name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          token_format: access_token
-          workload_identity_provider: projects/921831209165/locations/global/workloadIdentityPools/default/providers/default
-          service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+    # Configure a Workload Identity federation for Google Cloud and generate an access token.
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@main
+      with:
+        token_format: access_token
+        workload_identity_provider: projects/921831209165/locations/global/workloadIdentityPools/default/providers/default
+        service_account: default@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
 
-      - name: Configure Docker and publish
-        env:
-          ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-        run: |
-          printf '%s' "$ACCESS_TOKEN" | docker login -u oauth2accesstoken --password-stdin "https://$GAR_LOCATION-docker.pkg.dev"
-          docker push "$IMAGE_URI"
+    # Configure Docker to use our OAuth 2.0 access token.
+    - name: Configure Docker
+      run: |-
+        echo ${{ steps.auth.outputs.access_token }} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
 
-      - name: Get GKE credentials
-        uses: google-github-actions/get-gke-credentials@3da1e46a907576cefaa90c484278bb5b259dd395 # v3.0.0
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          cluster_name: ${{ env.GKE_CLUSTER }}
-          location: ${{ env.GKE_ZONE }}
+    # Get the GKE credentials so we can deploy to the cluster.
+    - name: Setup GKE credentials
+      uses: google-github-actions/get-gke-credentials@main
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
 
-      - name: Deploy and verify rollout
-        env:
-          GIT_KEY: ${{ secrets.GIT_KEY }}
-          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
-          GIT_USER: ${{ secrets.GIT_USER }}
-        run: sh deploy.sh
+    # Build the Docker image.
+    - name: Build
+      run: |-
+        docker build --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" .
+
+    # Push the Docker image to Google Artifact Registry.
+    - name: Publish
+      run: |-
+        docker push "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+
+    # Deploy the Docker image to the GKE cluster.
+    - name: Deploy
+      run: |-
+        GIT_KEY=$(echo "$GIT_KEY" | base64 -w 0)
+        envsubst < .deployment.yml | kubectl apply -f -

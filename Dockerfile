@@ -1,11 +1,12 @@
 ################################################################################
-# Build a ready-to-run committer; no package installation at container startup.  #
+# Docker setup script.                                                         #
 ################################################################################
-FROM alpine:3.24
-RUN apk add --no-cache git openssh-client
+# Set OS.
+FROM alpine:latest
 
-# Include only runtime files; credentials arrive through a Kubernetes Secret.
+# Build application.
 WORKDIR /app
 COPY commit.sh .
-COPY github_known_hosts /etc/ssh/ssh_known_hosts
+
+# Run application.
 ENTRYPOINT ["sh", "/app/commit.sh"]
