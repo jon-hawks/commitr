@@ -26,6 +26,9 @@ jobs:
   # Build and deploy this code (e.g. to a Kubernetes cluster).
   deploy:
     environment: production
+    concurrency:
+      group: commitr-production
+      cancel-in-progress: false
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -71,3 +74,14 @@ jobs:
       run: |-
         export GIT_KEY=$(echo "${{ secrets.GIT_KEY }}" | base64)
         envsubst < .deployment.yml | kubectl apply -f -
+
+    # Protect deployed image and two rollback revisions from registry cleanup.
+    - name: Retain Deployment Images
+      run: |-
+        set -o pipefail
+        kubectl rollout status deployment/commitr -n commitr-prod --timeout=180s
+        kubectl get replicasets -n commitr-prod -l app.kubernetes.io/name=commitr -o json |
+          jq -r '.items | sort_by(.metadata.annotations["deployment.kubernetes.io/revision"] | tonumber) | reverse | .[:3] | to_entries | reverse[] | "\(.key) \(.value.spec.template.spec.containers[0].image)"' |
+          while read -r slot image; do
+            docker buildx imagetools create --prefer-index=false --tag "us-central1-docker.pkg.dev/default-4/apps/commitr:keep-$slot" "$image"
+          done
