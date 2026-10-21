@@ -1,22 +1,41 @@
 ﻿################################################################################
 # Kubernetes deployment manifest.                                              #
 ################################################################################
+
+# Define Kubernetes resource type.
 apiVersion: apps/v1
 kind: Deployment
+
+# Set deployment name and namespace.
 metadata:
-  name: default
+  name: commitr
+  namespace: commitr-prod
+
+# Configure deployment behavior and pod template.
 spec:
+
+  # Retain two previous revisions for rollback.
   revisionHistoryLimit: 2
+
+  # Select pods managed by this deployment.
   selector:
     matchLabels:
-      app: default
+      app.kubernetes.io/name: commitr
+
+  # Define pods with matching selector labels.
   template:
     metadata:
       labels:
-        app: default
+        app.kubernetes.io/name: commitr
+
+    # Configure containers running in each pod.
     spec:
+
+      # Run image built for this commit.
       containers:
-      - image: "us-central1-docker.pkg.dev/default-4/default/default:$GITHUB_SHA"
+      - image: "us-central1-docker.pkg.dev/default-4/apps/commitr:$GITHUB_SHA"
+
+        # Configure Git identity, credentials, and target repository.
         env:
           - name: GIT_EMAIL
             value: "17555162+jon-hawks@users.noreply.github.com"
@@ -26,4 +45,4 @@ spec:
             value: "Jon Hawks"
           - name: GIT_REPO
             value: "$GITHUB_REPOSITORY"
-        name: default
+        name: commitr
