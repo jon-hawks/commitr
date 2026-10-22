@@ -2,4 +2,4 @@
 A boilerplate of infrastructure that deploys itself upon commit.
 
 ## Build Status
-[![Main](https://github.com/jon-hawks/commitr/workflows/deploy/badge.svg?branch=main)](https://github.com/jon-hawks/commitr/actions)
+[![Main](https://github.com/jon-hawks/commitr/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/jon-hawks/commitr/actions/workflows/deploy.yml)
